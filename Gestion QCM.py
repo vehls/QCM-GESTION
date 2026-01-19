@@ -10,7 +10,7 @@ st.markdown("""
     <style>
     .main { background-color: #f8f9fa; }
     .stProgress > div > div > div > div { background-color: #4CAF50; }
-    .question-box { background-color: #ffffff; padding: 20px; border-radius: 10px; border-left: 5px solid #007BFF; margin-bottom: 20px; }
+    .question-box { background-color: #0000000; padding: 20px; border-radius: 10px; border-left: 5px solid #007BFF; margin-bottom: 20px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -194,7 +194,7 @@ if st.session_state.index < total_q:
         if type_f == "success": st.success(msg_f)
         else: st.error(msg_f)
         
-        with st.expander("💡 PLUS-VALUE ACADÉMIQUE : Rappel de cours", expanded=True):
+        with st.expander("💡Rappel de cours", expanded=True):
             st.info(q['explication'])
         
         if st.button("Question suivante ➡️"):
@@ -224,3 +224,4 @@ else:
         st.session_state.score = 0
         st.session_state.feedback = None
         st.rerun()
+
