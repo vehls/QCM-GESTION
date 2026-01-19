@@ -162,7 +162,7 @@ if st.session_state.index < total_q:
     q = st.session_state.questions[st.session_state.index]
     
     # Bloc Question
-    st.markdown(f"### QUESTION {st.session_state.index + 1}/{total_q}")
+    st.markdown(f"### QUESTION {st.session_state.index + 1}/{total_q} (Gestion Financière)")
     st.markdown(f"**Thème :** `{q['theme']}`")
     
     with st.container():
@@ -221,6 +221,7 @@ else:
         st.session_state.score = 0
         st.session_state.feedback = None
         st.rerun()
+
 
 
 
