@@ -3,6 +3,7 @@ import random
 import time
 
 # --- CONFIGURATION DE LA PAGE ---
+st.set_page_config(page_title="QCM Gestion Financière", page_icon="📊", layout="centered")
 # --- STYLE PERSONNALISÉ (CSS) ---
 st.markdown("""
     <style>
@@ -152,8 +153,6 @@ with st.sidebar:
         st.rerun()
 
 # --- ZONE PRINCIPALE ---
-st.title("📊 Examen Blanc : Gestion & Rentabilité")
-
 # Barre de progression
 total_q = len(st.session_state.questions)
 progress = (st.session_state.index) / total_q
@@ -222,5 +221,6 @@ else:
         st.session_state.score = 0
         st.session_state.feedback = None
         st.rerun()
+
 
 
