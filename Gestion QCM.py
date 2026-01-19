@@ -1,14 +1,13 @@
+import streamlit as st
 import random
-import sys
 import time
 
-# Configuration de l'encodage pour Windows
-try:
-    sys.stdout.reconfigure(encoding='utf-8')
-except AttributeError:
-    pass
+# --- CONFIGURATION STREAMLIT ---
+st.set_page_config(page_title="Examen Blanc Gestion", page_icon="📊")
 
-questions = [
+# --- INITIALISATION DES DONNÉES (Ton script d'origine) ---
+if 'questions_list' not in st.session_state:
+    questions = [
     # --- CHAPITRE 1 : CHARGES FIXES ET VARIABLES ---
     {
         "theme": "Ch.1 - Nature des Charges",
@@ -292,72 +291,95 @@ questions = [
         "explication": "La VA est la richesse créée. Elle est ensuite 'mangée' par les différents acteurs (salariés, État, banques) avant qu'il ne reste le profit."
     }
 ]
-
-
-def run_quiz():
     random.shuffle(questions)
-    score = 0
-    total = len(questions)
-    start_time = time.time()
+    st.session_state.questions_list = questions
+    st.session_state.score = 0
+    st.session_state.start_time = time.time()
+    st.session_state.current_index = 0
+    st.session_state.quiz_finished = False
 
-    print("\n" + "="*70)
-    print("      EXAMEN BLANC QCM : GESTION FINANCIÈRE & RENTABILITÉ")
-    print("="*70)
-    print("Rappel : Uniquement sur les chapitres 1,2 et 3 (d'où le peu de questions)")
-    print("Par LV")
-    print("-" * 70)
-    print("PS : Toute personne utilisant ce QCM me doit un verre")
+# --- LOGIQUE D'AFFICHAGE ---
 
-    for i, q in enumerate(questions):
-        print(f"\nQUESTION {i+1}/{total} | Thème : {q['theme']}")
-        print(f"--- {q['question']} ---")
-        
+# En-tête identique
+st.text("="*70)
+st.text("      EXAMEN BLANC QCM : GESTION FINANCIÈRE & RENTABILITÉ")
+st.text("="*70)
+st.text("Rappel : Uniquement sur les chapitres 1,2 et 3 (d'où le peu de questions)")
+st.text("Par LV")
+st.text("-" * 70)
+st.text("PS : Toute personne utilisant ce QCM me doit un verre")
+
+if not st.session_state.quiz_finished:
+    i = st.session_state.current_index
+    total = len(st.session_state.questions_list)
+    q = st.session_state.questions_list[i]
+
+    # Affichage question identique
+    st.text(f"\nQUESTION {i+1}/{total} | Thème : {q['theme']}")
+    st.text(f"--- {q['question']} ---")
+
+    # Gestion des options et lettres
+    if f"opts_{i}" not in st.session_state:
         opts = q['options'][:]
         random.shuffle(opts)
-        letters = ['A', 'B', 'C', 'D', 'E']
-        correct_letters = []
-        
-        for idx, opt in enumerate(opts):
-            letter = letters[idx]
-            print(f"  {letter}. {opt}")
-            if opt in q['answers']:
-                correct_letters.append(letter)
-        
-        target = "".join(sorted(correct_letters))
+        st.session_state[f"opts_{i}"] = opts
 
-        # Saisie utilisateur
-        ans = input("\nVotre réponse (ex: ABD) : ").strip().upper()
+    letters = ['A', 'B', 'C', 'D', 'E']
+    correct_letters = []
+    
+    for idx, opt in enumerate(st.session_state[f"opts_{i}"]):
+        letter = letters[idx]
+        st.text(f"  {letter}. {opt}")
+        if opt in q['answers']:
+            correct_letters.append(letter)
+    
+    target = "".join(sorted(correct_letters))
+
+    # Saisie utilisateur
+    ans = st.text_input("\nVotre réponse (ex: ABD) : ", key=f"input_{i}").strip().upper()
+
+    if st.button("Valider la réponse"):
         user_ans = "".join(sorted(list(set(ans))))
 
-        # Feedback immédiat
+        # Feedback identique
         if user_ans == target:
-            print("CORRECT ! ✅")
-            score += 1
+            st.text("CORRECT ! ✅")
+            st.session_state.score += 1
         else:
-            print(f"INCORRECT ❌ | La bonne réponse était : {target}")
+            st.text(f"INCORRECT ❌ | La bonne réponse était : {target}")
         
-        # PLUS-VALUE ACADÉMIQUE : L'explication systématique
-        print(f"\n💡 RAPPEL DE COURS :")
-        print(f"{q['explication']}")
-        print("-" * 40)
-        time.sleep(1) # Pause pour laisser le temps de lire
+        st.text(f"\n💡 RAPPEL DE COURS :")
+        st.text(f"{q['explication']}")
+        st.text("-" * 40)
+        
+        # Passage à la suivante
+        if i + 1 < total:
+            st.session_state.current_index += 1
+            st.button("Question suivante")
+        else:
+            st.session_state.quiz_finished = True
+            st.button("Voir le bilan final")
 
-    # Bilan final
+else:
+    # Bilan final identique
     end_time = time.time()
-    temps_total = round((end_time - start_time) / 60, 2)
-    
-    print("\n" + "#"*30)
-    print(f" SCORE FINAL : {score} / {total}")
-    print(f" Temps écoulé : {temps_total} minutes")
-    print("#"*30)
+    temps_total = round((end_time - st.session_state.start_time) / 60, 2)
+    total = len(st.session_state.questions_list)
+    score = st.session_state.score
+
+    st.text("\n" + "#"*30)
+    st.text(f" SCORE FINAL : {score} / {total}")
+    st.text(f" Temps écoulé : {temps_total} minutes")
+    st.text("#"*30)
 
     success_rate = (score / total) * 100
     if success_rate >= 80:
-        print("Excellent ! Vous maîtrisez les concepts de rentabilité.")
+        st.text("Excellent ! Vous maîtrisez les concepts de rentabilité.")
     elif success_rate >= 50:
-        print("Résultats corrects, mais revoyez les formules des SIG et de la CAF.")
+        st.text("Résultats corrects, mais revoyez les formules des SIG et de la CAF.")
     else:
-        print("Attention : Les bases du compte différentiel et du bilan fonctionnel sont à relire.")
-
-if __name__ == "__main__":
-    run_quiz()
+        st.text("Attention : Les bases du compte différentiel et du bilan fonctionnel sont à relire.")
+    
+    if st.button("Recommencer le quiz"):
+        del st.session_state.questions_list
+        st.rerun()
